@@ -3,31 +3,6 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-rolled_build_slugs_list = []
-
-print('Retrieving env variables')
-workflow_names = os.environ.get('workflow_names')
-token = os.environ.get('token')
-base_url = os.environ.get('base_url')
-app_slug = os.environ.get('app_slug')
-build_slug = os.environ.get('build_slug')
-branch = os.environ.get('branch')
-
-running_builds_url = 'https://{}/apps/{}/builds?sort_by=created_at&branch={}&status=0'.format(base_url, app_slug, branch)
-print('URL: {}'.format(running_builds_url))
-
-retry_strategy = Retry(
-    total=3,
-    status_forcelist=[429, 502, 503, 504],
-    method_whitelist=['GET'],
-    raise_on_status=True,
-    backoff_factor= 2
-)
-adapter = HTTPAdapter(max_retries=retry_strategy)
-http = requests.Session()
-http.mount('https://', adapter)
-request_headers = {'Authorization': token}
-
 def abort(build):
     payload = {
         'abort_reason': 'Automatically aborted via Rolling Builds.',
@@ -42,8 +17,38 @@ def abort(build):
     else:
         print('Successfully aborted workflow {}'.format(build.triggered_workflow))
         rolled_build_slugs_list.append(build.slug)
+    return rolled_build_slugs_list
 
 def main():
+    global rolled_build_slugs_list
+    global http
+    global app_slug
+    global base_url
+    global request_headers
+    
+    rolled_build_slugs_list = []
+    print('Retrieving env variables')
+    workflow_names = os.environ.get('workflow_names')
+    token = os.environ.get('token')
+    base_url = os.environ.get('base_url')
+    app_slug = os.environ.get('app_slug')
+    build_slug = os.environ.get('build_slug')
+    branch = os.environ.get('branch')
+
+    running_builds_url = 'https://{}/apps/{}/builds?sort_by=created_at&branch={}&status=0'.format(base_url, app_slug, branch)
+    print('URL: {}'.format(running_builds_url))
+
+    retry_strategy = Retry(
+        total=3,
+        status_forcelist=[429, 502, 503, 504],
+        allowed_methods=['GET'],
+        raise_on_status=True,
+        backoff_factor= 2
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    http = requests.Session()
+    http.mount('https://', adapter)
+    request_headers = {'Authorization': token}
     request = http.get(running_builds_url, request_headers)
     response = request.json()
 
@@ -58,7 +63,6 @@ def main():
             print("Build {} not eligible to be rolled, skipping".format(build.triggered_workflow))
     rolled_build_slugs = '\n'.join(rolled_build_slugs_list)
     return rolled_build_slugs
-
 
 if __name__ == '__main__':
     main()
