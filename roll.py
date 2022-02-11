@@ -40,12 +40,11 @@ def main():
         'accept': 'application/json'
     }
     request = requests.get(running_builds_url, headers=request_headers)
-    print(request.headers)
     response = request.json()
     print(response)
 
-    running_builds = response.data
-    num_builds = response.paging
+    running_builds = response['data']
+    num_builds = response['paging']
     print('Found {} running builds!'.format(num_builds.total_item_count))
     for build in running_builds:
         if build.slug != build_slug and build.triggered_workflow in workflow_names:
