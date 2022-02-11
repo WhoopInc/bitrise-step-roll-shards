@@ -4,8 +4,8 @@ import requests
 def abort(build):
     payload = {
         'abort_reason': 'Automatically aborted via Rolling Builds.',
-        'abort_with_success': 'true',
-        'skip_notifications': 'true'
+        'abort_with_success': True,
+        'skip_notifications': True
     }
     abort_builds_url = 'https://{}/apps/{}/builds/{}/abort'.format(base_url, app_slug, build['slug'])
     request = requests.post(abort_builds_url, payload, headers=request_headers)
