@@ -32,12 +32,13 @@ def main():
     build_slug = os.environ.get('build_slug')
     branch = os.environ.get('branch')
 
-    print('token: {}'.format(token))
-
     running_builds_url = 'https://{}/apps/{}/builds?sort_by=created_at&branch={}&status=0'.format(base_url, app_slug, branch)
     print('URL: {}'.format(running_builds_url))
 
-    request_headers = {'Authorization': token}
+    request_headers = {
+        'Authorization': token,
+        'accept': 'application/json'
+    }
     print('Request headers: {}'.format(request_headers))
     request = requests.get(running_builds_url, request_headers)
     response = request.json()
