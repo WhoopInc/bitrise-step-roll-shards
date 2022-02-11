@@ -57,9 +57,9 @@ inputs:
       title: Build slug
       is_required: true
   - branch: $BITRISE_GIT_BRANCH
-      opts:
-        title: Triggered branch
-        is_required: true
+    opts:
+      title: Triggered branch
+      is_required: true
 outputs:
   - ROLLED_BUILD_SLUGS
     opts:
