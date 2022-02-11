@@ -1,19 +1,20 @@
 import os
 import requests
+import json
 
 def abort(build):
-    payload = {
+    payload = json.dumps({
         'abort_reason': 'Automatically aborted via Rolling Builds.',
         'abort_with_success': True,
         'skip_notifications': True
-    }
+    })
     abort_builds_url = 'https://{}/apps/{}/builds/{}/abort'.format(base_url, app_slug, build['slug'])
     request = requests.post(abort_builds_url, payload, headers=request_headers)
     if request.status_code != 200:
         print('Unable to abort workflow {}'.format(build['triggered_workflow']))
         print('Response: {}'.format(request.text))
     else:
-        print('Successfully aborted workflow {}'.format(build['triggered_workflow']))
+        print('Successfully aborted workflow {} with slug {}'.format(build['triggered_workflow'], build['slug']))
         rolled_build_slugs_list.append(build['slug'])
     return rolled_build_slugs_list
 
