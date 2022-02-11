@@ -1,7 +1,5 @@
 import os
 import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
 
 def abort(build):
     payload = {
@@ -10,7 +8,7 @@ def abort(build):
         'skip_notifications': 'true'
     }
     abort_builds_url = 'https://{}/apps/{}/builds/{}/abort'.format(base_url, app_slug, build.slug)
-    request = http.post(abort_builds_url, payload, request_headers)
+    request = requests.post(abort_builds_url, payload, request_headers)
     if request.status_code != 200:
         print('Unable to abort workflow {}'.format(build.triggered_workflow))
         print('Response: {}'.format(request.text))
@@ -21,7 +19,6 @@ def abort(build):
 
 def main():
     global rolled_build_slugs_list
-    global http
     global app_slug
     global base_url
     global request_headers
@@ -38,19 +35,9 @@ def main():
     running_builds_url = 'https://{}/apps/{}/builds?sort_by=created_at&branch={}&status=0'.format(base_url, app_slug, branch)
     print('URL: {}'.format(running_builds_url))
 
-    retry_strategy = Retry(
-        total=3,
-        status_forcelist=[429, 502, 503, 504],
-        allowed_methods=['GET'],
-        raise_on_status=True,
-        backoff_factor= 2
-    )
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-    http = requests.Session()
-    http.mount('https://', adapter)
     request_headers = {'Authorization': token}
     print('Request headers: {}'.format(request_headers))
-    request = http.get(running_builds_url, request_headers)
+    request = requests.get(running_builds_url, request_headers)
     response = request.json()
 
     running_builds = response.data
