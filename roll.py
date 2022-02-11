@@ -39,8 +39,8 @@ def main():
         'Authorization': token,
         'accept': 'application/json'
     }
-    print('Request headers: {}'.format(request_headers))
-    request = requests.get(running_builds_url, request_headers)
+    request = requests.get(running_builds_url, headers=request_headers)
+    print(request.headers)
     response = request.json()
     print(response)
 
