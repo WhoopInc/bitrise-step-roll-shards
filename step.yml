@@ -61,6 +61,6 @@ inputs:
       title: Triggered branch
       is_required: true
 outputs:
-  - ROLLED_BUILD_SLUGS
+  - ROLLED_BUILD_SLUGS:
     opts:
       title: List of builds that were aborted
