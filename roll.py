@@ -39,6 +39,7 @@ def main():
     print('Request headers: {}'.format(request_headers))
     request = requests.get(running_builds_url, request_headers)
     response = request.json()
+    print(response)
 
     running_builds = response.data
     num_builds = response.paging
