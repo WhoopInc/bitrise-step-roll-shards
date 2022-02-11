@@ -25,7 +25,7 @@ def main():
     global app_slug
     global base_url
     global request_headers
-    
+
     rolled_build_slugs_list = []
     print('Retrieving env variables')
     workflow_names = os.environ.get('workflow_names')
@@ -49,6 +49,7 @@ def main():
     http = requests.Session()
     http.mount('https://', adapter)
     request_headers = {'Authorization': token}
+    print('Request headers: {}'.format(request_headers))
     request = http.get(running_builds_url, request_headers)
     response = request.json()
 
