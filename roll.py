@@ -2,10 +2,9 @@ import os
 import requests
 import json
 
-def abort(build):
+def abort(build, base_url, app_slug, request_headers):
     payload = json.dumps({
         'abort_reason': 'Automatically aborted via Rolling Builds.',
-        'abort_with_success': True,
         'skip_notifications': True
     })
     abort_builds_url = 'https://{}/apps/{}/builds/{}/abort'.format(base_url, app_slug, build['slug'])
@@ -13,17 +12,12 @@ def abort(build):
     if request.status_code != 200:
         print('Unable to abort workflow {}'.format(build['triggered_workflow']))
         print('Response: {}'.format(request.text))
+        return False
     else:
         print('Successfully aborted workflow {} with slug {}'.format(build['triggered_workflow'], build['slug']))
-        rolled_build_slugs_list.append(build['slug'])
-    return rolled_build_slugs_list
+        return True
 
 def main():
-    global rolled_build_slugs_list
-    global app_slug
-    global base_url
-    global request_headers
-
     rolled_build_slugs_list = []
     print('Retrieving env variables')
     workflow_names = os.environ.get('workflow_names')
@@ -49,7 +43,9 @@ def main():
     for build in running_builds:
         if build['slug'] != build_slug and build['triggered_workflow'] in workflow_names:
             print("Build {} should be rolled, attempting abort".format(build['triggered_workflow']))
-            abort(build)
+            abort_successful = abort(build, base_url, app_slug, request_headers)
+            if abort_successful:
+                rolled_build_slugs_list.append(build['slug'])
         else:
             print("Build {} not eligible to be rolled, skipping".format(build['triggered_workflow']))
     rolled_build_slugs = '\n'.join(rolled_build_slugs_list)
