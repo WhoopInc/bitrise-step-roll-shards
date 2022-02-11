@@ -8,7 +8,7 @@ def abort(build):
         'skip_notifications': 'true'
     }
     abort_builds_url = 'https://{}/apps/{}/builds/{}/abort'.format(base_url, app_slug, build['slug'])
-    request = requests.post(abort_builds_url, payload, request_headers)
+    request = requests.post(abort_builds_url, payload, headers=request_headers)
     if request.status_code != 200:
         print('Unable to abort workflow {}'.format(build['triggered_workflow']))
         print('Response: {}'.format(request.text))
