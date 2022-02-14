@@ -1,0 +1,66 @@
+#
+# A couple of useful guides & docs:
+#
+# - Main Bitrise CLI docs: https://github.com/bitrise-io/bitrise/tree/master/_docs
+# - Step Development Guideline: https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+# - Bitrise.yml format spec: https://github.com/bitrise-io/bitrise/blob/master/_docs/bitrise-yml-format-spec.md
+# - Bitrise docs: http://devcenter.bitrise.io/
+# - Bitrise CLI guides: http://devcenter.bitrise.io/bitrise-cli/
+
+title: |-
+  roll-shards
+summary: |
+  Bitrise step to roll shards
+description: |
+  Bitrise step to roll shards. The Bitrise [Rolling Builds](https://blog.bitrise.io/post/auto-cancel-builds-and-keep-rolling)
+  feature for PRs only rolls builds with the same workflow name and branch. Builds kicked off via the `build-router-start`
+  step in a rolled build are however not killed by association. This step kills all shards associated with a build as soon
+  as the build is rolled.
+website: https://github.com/WhoopInc/bitrise-step-roll-shards
+source_code_url: https://github.com/WhoopInc/bitrise-step-roll-shards
+support_url: https://github.com/WhoopInc/bitrise-step-roll-shards/issues
+project_type_tags:
+  - android
+  - ios
+
+type_tags:
+  - utility
+
+is_requires_admin_user: false
+is_always_run: true
+is_skippable: false
+
+toolkit:
+  bash:
+    entry_file: step.sh
+
+inputs:
+  - workflow_names:
+    opts:
+      title: List of workflows to abort
+      summary: Only workflows included in this list will be rolled if running on the same branch
+      is_required: true
+  - token:
+    opts:
+      title: Token to authenticate with the Bitrise API
+      is_required: true
+  - base_url: "api.bitrise.io/v0.1"
+    opts:
+      title: Bitrise API base URL
+      is_required: true
+  - app_slug: $BITRISE_APP_SLUG
+    opts:
+      title: App slug
+      is_required: true
+  - build_slug: $BITRISE_BUILD_SLUG
+    opts:
+      title: Build slug
+      is_required: true
+  - branch: $BITRISE_GIT_BRANCH
+    opts:
+      title: Triggered branch
+      is_required: true
+outputs:
+  - ROLLED_BUILD_SLUGS:
+    opts:
+      title: List of builds that were aborted
