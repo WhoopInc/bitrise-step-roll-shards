@@ -49,6 +49,7 @@ def main():
         else:
             print("Build {} not eligible to be rolled, skipping".format(build['triggered_workflow']))
     rolled_build_slugs = '\n'.join(rolled_build_slugs_list)
+    # List of rolled builds is persisted as an env var for the rest of the build
     return rolled_build_slugs
 
 if __name__ == '__main__':
