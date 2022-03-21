@@ -33,7 +33,7 @@ def main():
     build_slug = os.environ.get('build_slug')
     branch = os.environ.get('branch')
     env_vars = [branch, build_slug, app_slug, base_url, token]
-    check_vars(token)
+    check_vars(env_vars)
 
     running_builds_url = 'https://{}/apps/{}/builds?sort_by=created_at&branch={}&status=0'.format(base_url, app_slug, branch)
     print('URL: {}'.format(running_builds_url))
