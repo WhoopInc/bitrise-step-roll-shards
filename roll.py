@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import sys
 
 def abort(build, base_url, app_slug, request_headers):
     payload = json.dumps({
@@ -16,6 +17,11 @@ def abort(build, base_url, app_slug, request_headers):
     else:
         print('Successfully aborted workflow {} with slug {}'.format(build['triggered_workflow'], build['slug']))
         return True
+def check_vars(env_vars):
+    for var in env_vars:
+        if not var:
+            print('{} is empty, exiting.'.format(var))
+            sys.exit(1)
 
 def main():
     rolled_build_slugs_list = []
@@ -26,6 +32,8 @@ def main():
     app_slug = os.environ.get('app_slug')
     build_slug = os.environ.get('build_slug')
     branch = os.environ.get('branch')
+    env_vars = [branch, build_slug, app_slug, base_url, token]
+    check_vars(token)
 
     running_builds_url = 'https://{}/apps/{}/builds?sort_by=created_at&branch={}&status=0'.format(base_url, app_slug, branch)
     print('URL: {}'.format(running_builds_url))
