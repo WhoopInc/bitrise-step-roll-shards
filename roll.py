@@ -18,10 +18,15 @@ def abort(build, base_url, app_slug, request_headers):
         print('Successfully aborted workflow {} with slug {}'.format(build['triggered_workflow'], build['slug']))
         return True
 def check_vars(env_vars):
+    missing_vars = []
     for var in env_vars:
         if not var:
-            print('{} is empty, exiting.'.format(var))
-            sys.exit(1)
+            missing_vars.append(var)
+    
+    if(len(missing_vars) > 0):
+        for var in missing_vars:
+            print('{} is empty'.format(var))
+        sys.exit(1)
 
 def main():
     rolled_build_slugs_list = []
